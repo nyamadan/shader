@@ -1,0 +1,20 @@
+{
+  "name": "shader",
+  "version": "0.0.1",
+  "description": "shader",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Yoshiki YAMADA",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "glob-watcher": "^5.0.3",
+    "glsl-noise": "^0.0.0",
+    "glsl-pi": "^1.0.0",
+    "glsl-y-rotate": "^3.0.0",
+    "glslify": "^7.0.0",
+    "glslify-import": "^3.1.0"
+  }
+}
