@@ -1,20 +1,21 @@
 {
   "name": "shader",
   "version": "0.0.1",
-  "description": "shader",
+  "description": "Transpile the GLSL shader.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js -V 310 --es -O",
+    "watch": "node index.js -V 310 --es -O --watch"
   },
   "author": "Yoshiki YAMADA",
   "license": "MIT",
   "devDependencies": {
+    "argparse": "^1.0.10",
+    "chokidar": "^3.3.1",
     "eslint": "^6.8.0",
-    "glob-watcher": "^5.0.3",
-    "glsl-noise": "^0.0.0",
-    "glsl-pi": "^1.0.0",
-    "glsl-y-rotate": "^3.0.0",
-    "glslify": "^7.0.0",
-    "glslify-import": "^3.1.0"
+    "glob": "^7.1.6",
+    "minimatch": "^3.0.4",
+    "node-shader-compiler": "git+ssh://git@github.com:nyamadan/node-shader-compiler.git#e6844bb",
+    "tmp": "^0.1.0"
   }
 }
