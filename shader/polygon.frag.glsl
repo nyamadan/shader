@@ -2,11 +2,11 @@
 
 precision mediump float;
 
-const float PI = 3.14159265359;
+#extension GL_GOOGLE_include_directive : enable
 
-layout(location = 0) uniform float time;
-layout(location = 1) uniform vec2 resolution;
-layout(location = 2) uniform vec2 mouse;
+#include "./lib/uniforms.glsl"
+
+const float PI = 3.14159265359;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -20,7 +20,7 @@ float polygonshape(vec2 position, float radius, float sides) {
 
 void main() {
   vec2 coord = gl_FragCoord.xy;
-  vec2 position = coord / resolution.xy;
+  vec2 position = coord / Resolution.xy;
   vec3 color = vec3(0.0);
 
   float polygon = polygonshape(position, 0.6, 6.0);

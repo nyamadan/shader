@@ -4,19 +4,17 @@ precision mediump float;
 
 #extension GL_GOOGLE_include_directive : enable
 
-layout(location=0) uniform vec2 resolution;
-layout(location=1) uniform float time;
-
-layout(location=0) out vec4 fragColor;
-
+#include "./lib/uniforms.glsl"
 #include "./lib/hsb.glsl"
 
+layout(location = 0) out vec4 fragColor;
+
 void main() {
-  vec2 st = gl_FragCoord.xy / resolution.xy;
+  vec2 st = gl_FragCoord.xy / Resolution.xy;
   vec3 color = vec3(0.0);
 
   vec2 toCenter = (vec2(0.5) - st);
-  float angle = atan(toCenter.y, toCenter.x) + time;
+  float angle = atan(toCenter.y, toCenter.x) + Time;
   float radius = length(toCenter) * 2.0;
 
   color = hsb2rgb(vec3(

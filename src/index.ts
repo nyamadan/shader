@@ -1,23 +1,24 @@
-const { watch } = require("chokidar");
-const { writeFile, readFileSync, unlink, write, mkdir } = require("fs");
-const { promisify } = require("util");
-const { compileFile } = require("node-shader-compiler");
-const { spawnSync } = require("child_process");
-const { ArgumentParser } = require("argparse");
-const glob = require("glob");
-const minimatch = require("minimatch");
-const path = require("path");
-const tmp = require("tmp");
+import { watch } from "chokidar";
+import { writeFile, readFileSync, unlink, write, mkdir } from "fs";
+import { promisify } from "util";
+import { compileFile, Includer } from "node-shader-compiler";
+import { spawnSync } from "child_process";
+import { ArgumentParser } from "argparse";
+import path from "path";
+import glob from "glob";
+import minimatch from "minimatch";
+import tmp from "tmp";
 
-const package = JSON.parse(readFileSync("package.json", { encoding: "utf8" }));
+const pkg = JSON.parse(readFileSync("package.json", { encoding: "utf8" }));
 
 const parser = new ArgumentParser({
-  version: package.version,
+  version: pkg.version,
   addHelp: true,
-  description: package.description,
+  description: pkg.description,
 });
 parser.addArgument(["-V", "--glsl-version"], {
   help: "Specify the version of GLSL to output.",
+  metavar: ["VERSION"],
   type: "int",
   required: true,
 });
@@ -33,42 +34,30 @@ parser.addArgument(["-w", "--watch"], {
   help: "Watch files.",
   action: "storeTrue",
 });
+parser.addArgument(["-D", "--define"], {
+  metavar: ["KEY", "VALUE"],
+  help: "Define symbols",
+  type: "string",
+  nargs: 2,
+  action: "append",
+  defaultValue: []
+});
 
 const args = parser.parseArgs();
-
-/**
- * @type {boolean}
- */
-const enableOptimization = args.enable_optimization;
-/**
- * @type {boolean}
- */
-const useGlslEs = args.es;
-/**
- * @type {number}
- */
-const glslVersion = args.glsl_version;
-
-/**
- * @type {boolean}
- */
-const isWatchMode = args.watch;
+const argEnableOptimization: boolean = args.enable_optimization;
+const argUseGlslEs: boolean = args.es;
+const argGlslVersion: number = args.glsl_version;
+const argIsWatchMode: boolean = args.watch;
+const argDefines: { [key: string]: string } = {};
+for (const [key, value] of args.define as ReadonlyArray<[string,string]>) {
+  argDefines[key] = value;
+}
 
 let processingCount = 0;
 
-/**
- * @type {Map<string, Set<string>>}
- */
-const dependencies = new Map();
+const dependencies = new Map<string, Set<string>>();
 
-/**
- *
- * @param {string} header
- * @param {string | null} includerPath
- * @param {number | null} depth
- * @returns {{header: string, content: string} | null}
- */
-function includer(header, includerPath, depth) {
+const includer: Includer = (header, includerPath, depth) => {
   if (includerPath == null || depth == null) {
     return null;
   }
@@ -81,7 +70,7 @@ function includer(header, includerPath, depth) {
   }
 
   const set = dependencies.get(includerPath);
-  set.add(filePath);
+  set?.add(filePath);
 
   try {
     const source = readFileSync(filePath, { encoding: "utf8" });
@@ -93,22 +82,17 @@ function includer(header, includerPath, depth) {
     console.error(e);
     return null;
   }
-}
+};
 
-/**
- *
- * @param {number} ms
- */
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- *
- * @param {string} file
- * @param {number} version
- * @param {boolean} es
- * @param {boolean} enableOptimization
- */
-const buildWithOption = async (file, version, es, enableOptimization) => {
+const buildWithOption = async (
+  file: string,
+  version: number,
+  es: boolean,
+  enableOptimization: boolean,
+  defines: {[key:string]: string}
+) => {
   console.log(`[node-shader-compiler]:Compile:${file}`);
 
   await wait(100);
@@ -117,6 +101,7 @@ const buildWithOption = async (file, version, es, enableOptimization) => {
     includer,
     version,
     es,
+    defines,
     enableBinarySpirv: enableOptimization,
     disableSourceCode: enableOptimization,
   });
@@ -159,7 +144,7 @@ const buildWithOption = async (file, version, es, enableOptimization) => {
       return;
     }
 
-    const option = ["--output", distname, f1, "--version", version];
+    const option = ["--output", distname, f1, "--version", version.toString()];
 
     if (es) {
       option.push("--es");
@@ -187,13 +172,13 @@ const buildWithOption = async (file, version, es, enableOptimization) => {
 /**
  * @param {string} file
  */
-const buildFile = async (file) => {
+const buildFile = async (file: string) => {
   processingCount++;
   if (processingCount === 1) {
     console.log("[node-shader-compiler]:BeginCompile");
   }
   try {
-    await buildWithOption(file, glslVersion, useGlslEs, enableOptimization);
+    await buildWithOption(file, argGlslVersion, argUseGlslEs, argEnableOptimization, argDefines);
   } catch (e) {
     console.error(e);
   }
@@ -203,7 +188,7 @@ const buildFile = async (file) => {
   }
 };
 
-const update = async (file) => {
+const update = async (file: string) => {
   if (!minimatch(file, "**/lib/**/*.glsl")) {
     await buildFile(file);
     return;
@@ -216,21 +201,20 @@ const update = async (file) => {
   }
 };
 
-if (!isWatchMode) {
+if (argIsWatchMode) {
+  const watcher = watch(["**/*.glsl"], {
+    ignored: ["node_modules/**/*.glsl", "dist/**/*.glsl"],
+    ignoreInitial: false,
+  });
+
+  watcher.on("add", update);
+  watcher.on("change", update);
+} else {
   (async () => {
     const files = await promisify(glob)("**/*.glsl", {
       ignore: ["node_modules/**/*.glsl", "dist/**/*.glsl", "**/lib/**/*.glsl"],
     });
 
-    await Promise.all(files.map(file => update(file)));
+    await Promise.all(files.map((file: string) => update(file)));
   })();
-  return;
 }
-
-const watcher = watch(["**/*.glsl"], {
-  ignored: ["node_modules/**/*.glsl", "dist/**/*.glsl"],
-  ignoreInitial: false,
-});
-
-watcher.on("add", update);
-watcher.on("change", update);

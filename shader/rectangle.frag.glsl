@@ -2,9 +2,9 @@
 
 precision mediump float;
 
-layout(location = 0) uniform float time;
-layout(location = 1) uniform vec2 resolution;
-layout(location = 2) uniform vec2 mouse;
+#extension GL_GOOGLE_include_directive : enable
+
+#include "./lib/uniforms.glsl"
 
 layout(location = 0) out vec4 fragColor;
 
@@ -17,7 +17,7 @@ float rectshape(vec2 position, vec2 scale) {
 }
 
 void main() {
-  vec2 position = gl_FragCoord.xy / resolution;
+  vec2 position = gl_FragCoord.xy / Resolution;
   vec3 color = vec3(0.0);
 
   float rectangle = rectshape(position, vec2(0.3));
