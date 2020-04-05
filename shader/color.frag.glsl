@@ -1,12 +1,8 @@
 #version 310 es
 
-#extension GL_GOOGLE_include_directive : enable
-
-#if GL_ES
 precision mediump float;
-#endif
 
-#define TWO_PI 6.28318530718
+#extension GL_GOOGLE_include_directive : enable
 
 layout(location=0) uniform vec2 resolution;
 layout(location=1) uniform float time;
