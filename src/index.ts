@@ -1,6 +1,7 @@
 import { watch } from "chokidar";
 import { writeFile, readFileSync, unlink, write, mkdir } from "fs";
 import { promisify } from "util";
+// eslint-disable-next-line no-unused-vars
 import { compileFile, Includer } from "node-shader-compiler";
 import { spawnSync } from "child_process";
 import { ArgumentParser } from "argparse";
@@ -189,16 +190,18 @@ const buildFile = async (file: string) => {
 };
 
 const update = async (file: string) => {
-  if (!minimatch(file, "**/lib/**/*.glsl")) {
+  if (minimatch(file, "**/*.frag.glsl")) {
     await buildFile(file);
     return;
   }
 
+  const tasks: Promise<void>[] = [];
   for (const [parent, children] of dependencies) {
     if (children.has(file)) {
-      await buildFile(parent);
+      tasks.push(buildFile(parent));
     }
   }
+  await Promise.all(tasks);
 };
 
 if (argIsWatchMode) {
@@ -211,8 +214,8 @@ if (argIsWatchMode) {
   watcher.on("change", update);
 } else {
   (async () => {
-    const files = await promisify(glob)("**/*.glsl", {
-      ignore: ["node_modules/**/*.glsl", "dist/**/*.glsl", "**/lib/**/*.glsl"],
+    const files = await promisify(glob)("**/*.frag.glsl", {
+      ignore: ["node_modules/**/*.glsl", "dist/**/*.glsl"],
     });
 
     await Promise.all(files.map((file: string) => update(file)));
