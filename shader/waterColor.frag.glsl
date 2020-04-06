@@ -9,7 +9,7 @@ precision mediump float;
 layout(location = 0) out vec4 fragColor;
 
 void main() {
-  vec2 coord = 6.0 * gl_FragCoord.xy / Resolution;
+  vec2 coord = 20.0 * gl_FragCoord.xy / Resolution;
 
   for (int n = 1; n < 8; n++) {
     float i = float(n);
