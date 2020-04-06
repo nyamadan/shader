@@ -7,7 +7,7 @@
   },
   "glslsandbox": {
     "scope": "glsl",
-    "prefix": "simpleshader",
+    "prefix": "setup es310",
     "body": [
       "#version 310 es",
       "",
