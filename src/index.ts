@@ -149,6 +149,8 @@ const buildWithOption = async (
 
     if (es) {
       option.push("--es");
+    } else {
+      option.push("--no-es");
     }
 
     const crossResult = spawnSync("spirv-cross", option, { encoding: "utf8" });
