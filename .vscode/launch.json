@@ -10,7 +10,7 @@
       "name": "Launch Program",
       "program": "${workspaceFolder}\\dist\\index.js",
       "args": [
-        "-V", "300", "--es", "-O", "-w"
+        "-V", "420", "-O", "-w"
       ]
     }
   ]
