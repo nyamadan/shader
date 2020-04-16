@@ -2716,9 +2716,9 @@ node-releases@^1.1.53:
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.53.tgz#2d821bfa499ed7c5dffc5e2f28c88e78a08ee3f4"
   integrity sha512-wp8zyQVwef2hpZ/dJH7SfSrIPD6YoJz6BDQDpGEkcA0s3LpAQoxBIYmfIq6QAhC1DhwsyCgTaTTcONwX8qzCuQ==
 
-"node-shader-compiler@git+ssh://git@github.com:nyamadan/node-shader-compiler.git#5426480":
+"node-shader-compiler@git+ssh://git@github.com:nyamadan/node-shader-compiler.git#v0.0.1":
   version "0.0.1"
-  resolved "git+ssh://git@github.com:nyamadan/node-shader-compiler.git#5426480e8e327179b494cee6cb2a6532ec5eaa3d"
+  resolved "git+ssh://git@github.com:nyamadan/node-shader-compiler.git#e346b4a6d120e0a9e9a57568b0d7b6a6f9faf15e"
   dependencies:
     "@babel/cli" "^7.8.4"
     "@babel/core" "^7.9.0"
