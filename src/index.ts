@@ -27,8 +27,12 @@ parser.addArgument(["--es"], {
   help: "Outputs the GLSL ES.",
   action: "storeTrue",
 });
-parser.addArgument(["-O", "--enable-optimization"], {
+parser.addArgument(["-O"], {
   help: "Optimize performance.",
+  action: "storeTrue",
+});
+parser.addArgument(["-Os"], {
+  help: "Optimize size.",
   action: "storeTrue",
 });
 parser.addArgument(["-w", "--watch"], {
@@ -45,7 +49,8 @@ parser.addArgument(["-D", "--define"], {
 });
 
 const args = parser.parseArgs();
-const argEnableOptimization: boolean = args.enable_optimization;
+const argPerformanceOptimization: boolean = args.O;
+const argSizeOptimization: boolean = args.Os;
 const argUseGlslEs: boolean = args.es;
 const argGlslVersion: number = args.glsl_version;
 const argIsWatchMode: boolean = args.watch;
@@ -91,12 +96,15 @@ const buildWithOption = async (
   file: string,
   version: number,
   es: boolean,
-  enableOptimization: boolean,
+  enablePerformanceOptimization: boolean,
+  enableSizeOptimization: boolean,
   defines: {[key:string]: string}
 ) => {
   console.log(`[node-shader-compiler]:Compile:${file}`);
 
-  await wait(100);
+  const enableOptimization = enablePerformanceOptimization || enableSizeOptimization;
+
+  await wait(500);
 
   const { isLinked, sourceCode, shaderLog, binarySpirv } = compileFile(file, {
     includer,
@@ -129,7 +137,17 @@ const buildWithOption = async (
 
     const f1 = tmp.tmpNameSync();
 
-    const optResult = spawnSync("spirv-opt", ["-O", f0.name, "-o", f1], {
+    const spirvOptOptions = [f0.name, "-o", f1];
+
+    if(enablePerformanceOptimization) {
+      spirvOptOptions.unshift("-O");
+    }
+
+    if(enableSizeOptimization) {
+      spirvOptOptions.unshift("-Os");
+    }
+
+    const optResult = spawnSync("spirv-opt", spirvOptOptions, {
       encoding: "utf8",
     });
 
@@ -181,7 +199,7 @@ const buildFile = async (file: string) => {
     console.log("[node-shader-compiler]:BeginCompile");
   }
   try {
-    await buildWithOption(file, argGlslVersion, argUseGlslEs, argEnableOptimization, argDefines);
+    await buildWithOption(file, argGlslVersion, argUseGlslEs, argPerformanceOptimization, argSizeOptimization, argDefines);
   } catch (e) {
     console.error(e);
   }
