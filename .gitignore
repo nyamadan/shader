@@ -6,6 +6,7 @@ imgui.ini
 
 # build
 dist
+out
 
 ### node
 

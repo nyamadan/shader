@@ -1,5 +1,5 @@
-#ifndef __HSB__
-#define __HSB__
+#ifndef HSB
+#define HSB
 vec3 rgb2hsb(in vec3 c) {
   vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
 

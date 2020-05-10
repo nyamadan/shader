@@ -71,10 +71,6 @@ const includer: Includer = (header, includerPath, depth) => {
   const fileDir = path.dirname(includerPath);
   const filePath = path.join(fileDir, header);
 
-  if (depth === 1) {
-    dependencies.set(includerPath, new Set());
-  }
-
   const set = dependencies.get(includerPath);
   set?.add(filePath);
 
@@ -106,6 +102,9 @@ const buildWithOption = async (
 
   await wait(500);
 
+  // clear
+  dependencies.set(file, new Set());
+
   const { isLinked, sourceCode, shaderLog, binarySpirv } = compileFile(file, {
     includer,
     version,
@@ -125,7 +124,7 @@ const buildWithOption = async (
   const distDir = path
     .dirname(file)
     .split(path.sep)
-    .map((x, i) => (i == 0 ? "dist" : x))
+    .map((x, i) => (i == 0 ? "out" : x))
     .join(path.sep);
   await promisify(mkdir)(distDir, { recursive: true });
   const distname = path.join(distDir, `${basename}${ext}`);
@@ -226,7 +225,7 @@ const update = async (file: string) => {
 
 if (argIsWatchMode) {
   const watcher = watch(["**/*.glsl"], {
-    ignored: ["node_modules/**/*.glsl", "dist/**/*.glsl"],
+    ignored: ["node_modules/**/*.glsl", "out/**/*.glsl"],
     ignoreInitial: false,
   });
 
@@ -235,7 +234,7 @@ if (argIsWatchMode) {
 } else {
   (async () => {
     const files = await promisify(glob)("**/*.frag.glsl", {
-      ignore: ["node_modules/**/*.glsl", "dist/**/*.glsl"],
+      ignore: ["node_modules/**/*.glsl", "out/**/*.glsl"],
     });
 
     await Promise.all(files.map((file: string) => update(file)));
