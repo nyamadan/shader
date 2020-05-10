@@ -13,10 +13,10 @@ float circleshape(vec2 position, float radius) {
 }
 
 void main() {
-  vec2 coord = gl_FragCoord.xy / Resolution.xy;
+  vec2 coord = gl_FragCoord.xy / resolution.xy;
   vec3 color = vec3(0.0);
 
-  vec2 translate = vec2(sin(Time / 10.0), cos(Time));
+  vec2 translate = vec2(sin(time / 10.0), cos(time));
 
   coord -= translate * 0.5;
 

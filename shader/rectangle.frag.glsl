@@ -17,7 +17,7 @@ float rectshape(vec2 position, vec2 scale) {
 }
 
 void main() {
-  vec2 position = gl_FragCoord.xy / Resolution;
+  vec2 position = gl_FragCoord.xy / resolution;
   vec3 color = vec3(0.0);
 
   float rectangle = rectshape(position, vec2(0.3));

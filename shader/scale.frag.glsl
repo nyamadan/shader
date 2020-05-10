@@ -15,11 +15,11 @@ mat2 scale(vec2 scale) { return mat2(scale.x, 0.0, 0.0, scale.y); }
 layout(location = 0) out vec4 fragColor;
 
 void main() {
-  vec2 coord = gl_FragCoord.xy / Resolution;
+  vec2 coord = gl_FragCoord.xy / resolution;
   vec3 color = vec3(0.0);
 
   coord -= vec2(0.5);
-  coord = scale(vec2(sin(Time) + 2.0)) * coord;
+  coord = scale(vec2(sin(time) + 2.0)) * coord;
   coord += vec2(0.5);
 
   color = vec3(circle(coord, 0.3));

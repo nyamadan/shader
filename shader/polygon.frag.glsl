@@ -20,7 +20,7 @@ float polygonshape(vec2 position, float radius, float sides) {
 
 void main() {
   vec2 coord = gl_FragCoord.xy;
-  vec2 position = coord / Resolution.xy;
+  vec2 position = coord / resolution.xy;
   vec3 color = vec3(0.0);
 
   float polygon = polygonshape(position, 0.6, 6.0);

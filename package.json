@@ -4,7 +4,7 @@
   "description": "Transpile the GLSL shader.",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/index.js -V 100 --es -O -w",
+    "start": "node dist/index.js -V 300 --es -O -w",
     "build": "babel src/index.ts --out-dir dist --extensions \".ts\" --source-maps inline",
     "watch": "babel src/index.ts --out-dir dist --extensions \".ts\" --source-maps inline --watch",
     "install": "npm run build"
