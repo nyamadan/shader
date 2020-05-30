@@ -4,7 +4,7 @@
   "description": "Transpile the GLSL shader.",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/index.js -V 300 --es -O -w",
+    "start": "node dist/index.js -V 300 --es -w",
     "build": "babel src/index.ts --out-dir dist --extensions \".ts\" --source-maps inline",
     "watch": "babel src/index.ts --out-dir dist --extensions \".ts\" --source-maps inline --watch",
     "install": "npm run build"
@@ -27,7 +27,7 @@
     "eslint": "^7.0.0",
     "glob": "^7.1.6",
     "minimatch": "^3.0.4",
-    "node-shader-compiler": "git+ssh://git@github.com:nyamadan/node-shader-compiler.git#v0.0.4",
+    "node-shader-compiler": "git+ssh://git@github.com:nyamadan/node-shader-compiler.git#v0.0.6",
     "tmp": "^0.2.1",
     "typescript": "^3.8.3"
   }

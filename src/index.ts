@@ -61,30 +61,7 @@ for (const [key, value] of args.define as ReadonlyArray<[string,string]>) {
 
 let processingCount = 0;
 
-const dependencies = new Map<string, Set<string>>();
-
-const includer: Includer = (header, includerPath, depth) => {
-  if (includerPath == null || depth == null) {
-    return null;
-  }
-
-  const fileDir = path.dirname(includerPath);
-  const filePath = path.join(fileDir, header);
-
-  const set = dependencies.get(includerPath);
-  set?.add(filePath);
-
-  try {
-    const source = readFileSync(filePath, { encoding: "utf8" });
-    return {
-      header: filePath,
-      content: source,
-    };
-  } catch (e) {
-    console.error(e);
-    return null;
-  }
-};
+const fileDependencies = new Map<string, Set<string>>();
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -102,17 +79,15 @@ const buildWithOption = async (
 
   await wait(500);
 
-  // clear
-  dependencies.set(file, new Set());
-
-  const { isLinked, sourceCode, shaderLog, binarySpirv } = compileFile(file, {
-    includer,
+  const { isLinked, sourceCode, shaderLog, binarySpirv, dependencies } = compileFile(file, {
     version,
     es,
     defines,
     enableBinarySpirv: enableOptimization,
     disableSourceCode: enableOptimization,
   });
+
+  fileDependencies.set(file, new Set(dependencies.map(x => x.header)));
 
   if (!isLinked) {
     console.error(shaderLog);
@@ -215,7 +190,7 @@ const update = async (file: string) => {
   }
 
   const tasks: Promise<void>[] = [];
-  for (const [parent, children] of dependencies) {
+  for (const [parent, children] of fileDependencies) {
     if (children.has(file)) {
       tasks.push(buildFile(parent));
     }

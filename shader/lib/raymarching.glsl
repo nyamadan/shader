@@ -40,16 +40,29 @@ float calcSoftshadow(in vec3 ro, in vec3 rd, in float mint, in float tmax) {
 }
 
 mat4 lookAt(in vec3 eye, in vec3 center, in vec3 up) {
-  vec3 z = normalize(eye - center);
-  vec3 x = normalize(cross(z, normalize(up)));
-  vec3 y = normalize(cross(x, z));
+  vec3 f = normalize(center - eye);
+  vec3 s = normalize(cross(f, up));
+  vec3 u = cross(s, f);
 
-  return mat4(vec4(x, 0.0), vec4(y, 0.0), vec4(-z, 0.0), vec4(-eye, 1.0));
+  mat4 m;
+  m[0][0] = s.x;
+  m[1][0] = s.y;
+  m[2][0] = s.z;
+  m[0][1] = u.x;
+  m[1][1] = u.y;
+  m[2][1] = u.z;
+  m[0][2] = -f.x;
+  m[1][2] = -f.y;
+  m[2][2] = -f.z;
+  m[3][0] = -dot(s, eye);
+  m[3][1] = -dot(u, eye);
+  m[3][2] = dot(f, eye);
+  return m;
 }
 
-vec3 getRay(in vec2 p, in mat3 mView, in float fov) {
+vec3 getRay(in vec2 p, in mat3 m, in float fov) {
   float f = 1.0 / tan(radians(0.5 * fov));
-  return normalize(mView * vec3(-p.x, p.y, f));
+  return normalize(m * vec3(p.x, p.y, -f));
 }
 
 #endif
