@@ -27,7 +27,7 @@
     "eslint": "^7.1.0",
     "glob": "^7.1.6",
     "minimatch": "^3.0.4",
-    "node-shader-compiler": "git+ssh://git@github.com:nyamadan/node-shader-compiler.git#v0.0.6",
+    "node-shader-compiler": "git+ssh://git@github.com:nyamadan/node-shader-compiler.git#v0.0.1",
     "tmp": "^0.2.1",
     "typescript": "^3.9.3"
   }
