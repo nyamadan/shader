@@ -13,8 +13,8 @@ layout(location = 4) uniform mat4 mat_mv_it;
 
 layout(location = 0) out vec4 fragColor;
 
-#include "./lib/distance_functions.glsl"
-#include "./lib/raymarching.glsl"
+#include "./lib/_distance_functions.glsl"
+#include "./lib/_raymarching.glsl"
 
 // materials
 const int MATERIAL_EMPTY = 0;

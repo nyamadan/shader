@@ -4,7 +4,7 @@ precision mediump float;
 
 #extension GL_GOOGLE_include_directive : enable
 
-#include "./lib/uniforms.glsl"
+#include "./lib/_uniforms.glsl"
 
 float circle(vec2 position, float radius) {
   return step(radius, length(position - vec2(0.5)));

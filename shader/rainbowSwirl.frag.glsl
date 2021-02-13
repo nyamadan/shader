@@ -4,7 +4,7 @@ precision mediump float;
 
 #extension GL_GOOGLE_include_directive : enable
 
-#include "./lib/uniforms.glsl"
+#include "./lib/_uniforms.glsl"
 
 layout(location=0) out vec4 fragColor;
 

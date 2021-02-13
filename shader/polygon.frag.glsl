@@ -4,7 +4,7 @@ precision mediump float;
 
 #extension GL_GOOGLE_include_directive : enable
 
-#include "./lib/uniforms.glsl"
+#include "./lib/_uniforms.glsl"
 
 const float PI = 3.14159265359;
 

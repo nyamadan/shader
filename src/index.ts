@@ -45,7 +45,7 @@ parser.addArgument(["-D", "--define"], {
   type: "string",
   nargs: 2,
   action: "append",
-  defaultValue: []
+  defaultValue: [],
 });
 
 const args = parser.parseArgs();
@@ -55,7 +55,7 @@ const argUseGlslEs: boolean = args.es;
 const argGlslVersion: number = args.glsl_version;
 const argIsWatchMode: boolean = args.watch;
 const argDefines: { [key: string]: string } = {};
-for (const [key, value] of args.define as ReadonlyArray<[string,string]>) {
+for (const [key, value] of args.define as ReadonlyArray<[string, string]>) {
   argDefines[key] = value;
 }
 
@@ -71,15 +71,22 @@ const buildWithOption = async (
   es: boolean,
   enablePerformanceOptimization: boolean,
   enableSizeOptimization: boolean,
-  defines: {[key:string]: string}
+  defines: { [key: string]: string }
 ) => {
   console.log(`[node-shader-compiler]:Compile:${file}`);
 
-  const enableOptimization = enablePerformanceOptimization || enableSizeOptimization;
+  const enableOptimization =
+    enablePerformanceOptimization || enableSizeOptimization;
 
   await wait(500);
 
-  const { isLinked, sourceCode, shaderLog, binarySpirv, dependencies } = compileFile(file, {
+  const {
+    isLinked,
+    sourceCode,
+    shaderLog,
+    binarySpirv,
+    dependencies,
+  } = compileFile(file, {
     version,
     es,
     defines,
@@ -87,7 +94,7 @@ const buildWithOption = async (
     disableSourceCode: enableOptimization,
   });
 
-  fileDependencies.set(file, new Set(dependencies.map(x => x.header)));
+  fileDependencies.set(file, new Set(dependencies.map((x) => x.header)));
 
   if (!isLinked) {
     console.error(shaderLog);
@@ -113,11 +120,11 @@ const buildWithOption = async (
 
     const spirvOptOptions = [f0.name, "-o", f1];
 
-    if(enablePerformanceOptimization) {
+    if (enablePerformanceOptimization) {
       spirvOptOptions.unshift("-O");
     }
 
-    if(enableSizeOptimization) {
+    if (enableSizeOptimization) {
       spirvOptOptions.unshift("-Os");
     }
 
@@ -173,7 +180,14 @@ const buildFile = async (file: string) => {
     console.log("[node-shader-compiler]:BeginCompile");
   }
   try {
-    await buildWithOption(file, argGlslVersion, argUseGlslEs, argPerformanceOptimization, argSizeOptimization, argDefines);
+    await buildWithOption(
+      file,
+      argGlslVersion,
+      argUseGlslEs,
+      argPerformanceOptimization,
+      argSizeOptimization,
+      argDefines
+    );
   } catch (e) {
     console.error(e);
   }
@@ -184,18 +198,18 @@ const buildFile = async (file: string) => {
 };
 
 const update = async (file: string) => {
-  if (minimatch(file, "**/*.frag.glsl")) {
-    await buildFile(file);
+  if (minimatch(file, "**/_*.glsl")) {
+    const tasks: Promise<void>[] = [];
+    for (const [parent, children] of fileDependencies) {
+      if (children.has(file)) {
+        tasks.push(buildFile(parent));
+      }
+    }
+    await Promise.all(tasks);
     return;
   }
 
-  const tasks: Promise<void>[] = [];
-  for (const [parent, children] of fileDependencies) {
-    if (children.has(file)) {
-      tasks.push(buildFile(parent));
-    }
-  }
-  await Promise.all(tasks);
+  await buildFile(file);
 };
 
 if (argIsWatchMode) {
@@ -208,8 +222,8 @@ if (argIsWatchMode) {
   watcher.on("change", update);
 } else {
   (async () => {
-    const files = await promisify(glob)("**/*.frag.glsl", {
-      ignore: ["node_modules/**/*.glsl", "out/**/*.glsl"],
+    const files = await promisify(glob)("**/*.glsl", {
+      ignore: ["**/_*.glsl", "node_modules/**/*.glsl", "out/**/*.glsl"],
     });
 
     await Promise.all(files.map((file: string) => update(file)));
