@@ -99,7 +99,7 @@ const buildWithOption = async (
   const distDir = path
     .dirname(file)
     .split(path.sep)
-    .map((x, i) => (i == 0 ? "out" : x))
+    .flatMap((x, i) => (i == 0 ? ["out", x] : [x]))
     .join(path.sep);
   await promisify(mkdir)(distDir, { recursive: true });
   const distname = path.join(distDir, `${basename}${ext}`);
